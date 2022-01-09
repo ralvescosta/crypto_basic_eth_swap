@@ -8,7 +8,8 @@ contract EthSwap {
 
   Token public token;
 
-  event TokenPurchased(address account, address token, uint amount, uint rate);
+  event TokensPurchased(address account, address token, uint amount, uint rate);
+  event TokensSold(address account, address token, uint amount, uint rate);
 
   constructor(Token _token) public {
     token = _token;
@@ -24,6 +25,23 @@ contract EthSwap {
     token.transfer(msg.sender, tokenAmount);
 
     // Emit token pruchase event
-    emit TokenPurchased(msg.sender, address(token), tokenAmount, rate);
+    emit TokensPurchased(msg.sender, address(token), tokenAmount, rate);
+  }
+
+  function sellTokens(uint _amount) public {
+    // user can't sell more tokens than they have
+    require(token.balanceOf(msg.sender) >= _amount);
+
+    uint etherAmount = _amount / rate;
+
+    // Require that EthSwap has enough tokens
+    require(address(this).balance >= etherAmount);
+
+    // Perform sale
+    token.transferFrom(msg.sender, address(this), _amount);
+    msg.sender.transfer(etherAmount);
+
+    // Emit token sold event
+    emit TokensSold(msg.sender, address(token), _amount, rate);
   }
 }
