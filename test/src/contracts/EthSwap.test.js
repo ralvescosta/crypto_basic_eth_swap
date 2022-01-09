@@ -17,8 +17,8 @@ contract('EthSwap', (accounts) => {
     let ethSwap, token
 
     before(async () => {
-      ethSwap = await EthSwap.new();
       token = await Token.new();
+      ethSwap = await EthSwap.new(token.address);
     })
 
     it('should contract has a name', async () => {
